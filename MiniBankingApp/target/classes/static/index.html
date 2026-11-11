@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniBank Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>MiniBank</h2>
+        <p>ADMIN PANEL</p>
+
+        <a href="#" class="active"
+           onclick="showSection('dashboard', this); return false;">
+            Dashboard
+        </a>
+
+        <a href="#"
+           onclick="showSection('profile', this); return false;">
+            Admin Profile
+        </a>
+
+        <a href="#"
+           onclick="showSection('customers', this); return false;">
+            Customers
+        </a>
+
+        <a href="#"
+           onclick="showSection('transactions', this); return false;">
+            Transactions
+        </a>
+
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+
+        <!-- Header -->
+        <header>
+            <div>
+                <h1>Dashboard Overview</h1>
+                <p>Welcome to MiniBank Administration</p>
+            </div>
+
+            <span id="adminName">Administrator</span>
+        </header>
+
+        <!-- Admin Profile Section -->
+        <section id="profile" class="content-section" style="display:none">
+
+            <h2>Admin Profile</h2>
+
+            <div class="cards">
+
+                <div class="card">
+                    <h3>Username</h3>
+                    <h2 id="adminUsername">-</h2>
+                </div>
+
+                <div class="card">
+                    <h3>Account ID</h3>
+                    <h2 id="adminAccountId">-</h2>
+                </div>
+
+                <div class="card">
+                    <h3>Role</h3>
+                    <h2 id="adminRole">ADMIN</h2>
+                </div>
+
+            </div>
+
+            <!-- Change Password -->
+            <div class="card" style="margin-top:25px">
+
+                <h2>Change Password</h2>
+
+                <input type="password"
+                       id="oldPassword"
+                       placeholder="Current Password">
+
+                <input type="password"
+                       id="newPassword"
+                       placeholder="New Password">
+
+                <input type="password"
+                       id="confirmPassword"
+                       placeholder="Confirm New Password">
+
+                <button onclick="changeAdminPassword()">
+                    Update Password
+                </button>
+
+                <p id="profileMessage"></p>
+
+            </div>
+
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section">
+
+            <section class="cards">
+
+                <div class="card">
+                    <h3>Total Customers</h3>
+                    <h2 id="customersCount">0</h2>
+                </div>
+
+                <div class="card">
+                    <h3>Total Bank Balance</h3>
+                    <h2 id="balance">₹0</h2>
+                </div>
+
+                <div class="card">
+                    <h3>Total Transactions</h3>
+                    <h2 id="transactionsCount">0</h2>
+                </div>
+
+                <div class="card">
+                    <h3>Total Deposits</h3>
+                    <h2 id="deposits">₹0</h2>
+                </div>
+
+                <div class="card">
+                    <h3>Total Withdrawals</h3>
+                    <h2 id="withdrawals">₹0</h2>
+                </div>
+
+                <div class="card">
+                    <h3>Total Transfers</h3>
+                    <h2 id="transfers">₹0</h2>
+                </div>
+
+            </section>
+
+            <!-- Banking Chart -->
+            <section class="chart-section">
+
+                <h2>Banking Statistics</h2>
+
+                <canvas id="bankChart"></canvas>
+
+            </section>
+
+        </section>
+
+        <!-- Customers Section -->
+        <section id="customers"
+                 class="content-section"
+                 style="display:none">
+
+            <h2>Customer Details</h2>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="customerTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+        <!-- Transactions Section -->
+        <section id="transactions"
+                 class="content-section"
+                 style="display:none">
+
+            <h2>Bank Transactions</h2>
+
+            <!-- Transaction History -->
+            <h2>Transaction History</h2>
+
+            <!-- Transaction Filters -->
+            <div class="cards">
+
+                <div class="card">
+
+                    <h3>Search Transaction</h3>
+
+                    <input type="number"
+                           id="searchTransactionId"
+                           placeholder="Enter Transaction ID">
+
+                </div>
+
+                <div class="card">
+
+                    <h3>Transaction Type</h3>
+
+                    <select id="transactionType">
+
+                        <option value="ALL">All Transactions</option>
+                        <option value="DEPOSIT">Deposit</option>
+                        <option value="WITHDRAW">Withdraw</option>
+                        <option value="TRANSFER">Transfer</option>
+
+                    </select>
+
+                </div>
+
+                <div class="card">
+
+                    <h3>From Date</h3>
+
+                    <input type="date" id="fromDate">
+
+                    <h3>To Date</h3>
+
+                    <input type="date" id="toDate">
+
+                </div>
+
+            </div>
+
+            <!-- Filter Buttons -->
+            <button onclick="applyTransactionFilters()">
+                Apply Filters
+            </button>
+
+            <button onclick="resetTransactionFilters()">
+                Reset Filters
+            </button>
+
+            <!-- Transaction Table -->
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Sender</th>
+                            <th>Receiver</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="transactionTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Admin JavaScript -->
+    <script src="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,314 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniBank Customer Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 22px 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            margin: 0;
+        }
+
+        .container {
+            padding: 30px;
+        }
+
+        .welcome {
+            margin-bottom: 25px;
+        }
+
+        .balance-card {
+            background: linear-gradient(120deg, #2563eb, #172554);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 450px;
+            margin-bottom: 30px;
+        }
+
+        .balance-card h1 {
+            font-size: 36px;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0001;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .logout {
+            width: auto;
+            background: #dc2626;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 13px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        th {
+            background: #dbeafe;
+        }
+
+        #message, #profileMessage {
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 35px;
+        }
+
+        .receipt {
+            background: white;
+            padding: 25px;
+            max-width: 500px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            margin: 30px auto;
+        }
+
+        @media(max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            header {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>MiniBank</h2>
+    <button class="logout" onclick="logout()">Logout</button>
+</header>
+
+<div class="container">
+
+    <div class="welcome">
+        <h2>Welcome, <span id="username"></span>!</h2>
+        <p>Your personal banking dashboard</p>
+        <p>Account ID: <strong id="accountId"></strong></p>
+    </div>
+
+    <div class="balance-card">
+        <p>Available Balance</p>
+        <h1 id="balance">₹0.00</h1>
+    </div>
+
+    <h2>Banking Services</h2>
+
+    <div class="actions">
+
+        <div class="card">
+            <h3>Deposit Money</h3>
+            <input type="number" id="depositAmount"
+                   placeholder="Enter amount" min="0.01" step="0.01">
+            <button onclick="deposit()">Deposit</button>
+        </div>
+
+        <div class="card">
+            <h3>Withdraw Money</h3>
+            <input type="number" id="withdrawAmount"
+                   placeholder="Enter amount" min="0.01" step="0.01">
+            <button onclick="withdraw()">Withdraw</button>
+        </div>
+
+        <div class="card">
+            <h3>Transfer Money</h3>
+            <input type="number" id="receiverId"
+                   placeholder="Receiver Account ID" min="1">
+            <input type="number" id="transferAmount"
+                   placeholder="Enter amount" min="0.01" step="0.01">
+            <button onclick="transfer()">Transfer</button>
+        </div>
+
+    </div>
+
+    <p id="message"></p>
+	
+	<div class="card" style="margin-top:20px;">
+
+	    <h3>Search Transactions</h3>
+
+	    <input type="number" id="searchTransactionId"
+	           placeholder="Search by Transaction ID">
+
+	    <select id="transactionType"
+	            style="width:100%;padding:12px;margin:10px 0;">
+	        <option value="ALL">All Transactions</option>
+	        <option value="DEPOSIT">Deposits</option>
+	        <option value="WITHDRAW">Withdrawals</option>
+	        <option value="TRANSFER">Transfers</option>
+	    </select>
+
+	    <label>From Date</label>
+	    <input type="date" id="fromDate">
+
+	    <label>To Date</label>
+	    <input type="date" id="toDate">
+
+	    <button onclick="filterTransactions()">Apply Filters</button>
+	    <button onclick="resetTransactionFilters()"
+	            style="margin-top:10px;background:#64748b;">
+	        Reset Filters
+	    </button>
+
+	</div>
+
+    <!-- Transaction History -->
+    <div class="table-container">
+
+        <h2>Transaction History</h2>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <h3>Account Statement</h3>
+            <button onclick="downloadStatement()" style="width:auto;">
+                Download Statement
+            </button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody id="transactionTable"></tbody>
+        </table>
+
+    </div>
+
+    <!-- Transaction Receipt -->
+    <div id="receiptSection" style="display:none; margin-top:30px;">
+
+        <div id="receipt" class="receipt">
+
+            <h2 style="text-align:center;color:#2563eb;">MiniBank</h2>
+            <h3 style="text-align:center;">Transaction Receipt</h3>
+
+            <hr>
+
+            <p>Transaction ID: <strong id="receiptId"></strong></p>
+            <p>Account Holder: <strong id="receiptName"></strong></p>
+            <p>Transaction Type: <strong id="receiptType"></strong></p>
+            <p>Sender Account: <strong id="receiptSender"></strong></p>
+            <p>Receiver Account: <strong id="receiptReceiver"></strong></p>
+            <p>Amount: <strong id="receiptAmount"></strong></p>
+            <p>Date: <strong id="receiptDate"></strong></p>
+            <p>Status: <strong id="receiptStatus"></strong></p>
+
+            <hr>
+
+            <p style="text-align:center;">
+                Thank you for banking with MiniBank!
+            </p>
+
+        </div>
+
+        <div style="text-align:center;">
+            <button onclick="printReceipt()" style="max-width:200px;">
+                Print Receipt
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Customer Profile -->
+    <section class="card" style="margin-top:30px;">
+
+        <h2>My Profile</h2>
+
+        <p>Account ID: <strong id="profileId"></strong></p>
+        <p>Username: <strong id="profileUsername"></strong></p>
+        <p>Account Role: <strong id="profileRole"></strong></p>
+
+        <h3>Change Password</h3>
+
+        <input type="password" id="oldPassword"
+               placeholder="Current Password">
+
+        <input type="password" id="newPassword"
+               placeholder="New Password (minimum 8 characters)">
+
+        <button onclick="changePassword()">Change Password</button>
+
+        <p id="profileMessage"></p>
+
+    </section>
+
+</div>
+
+<script src="customer.js"></script>
+
+</body>
+</html>

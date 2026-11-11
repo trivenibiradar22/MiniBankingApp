@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniBank Login</title>
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #172554;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            width: 350px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px #0003;
+        }
+
+        .login-box h1 {
+            text-align: center;
+            color: #1d4ed8;
+        }
+
+        .login-box p {
+            text-align: center;
+            color: #64748b;
+        }
+
+        .login-box input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 13px;
+            margin: 10px 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 13px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        #message {
+            margin-top: 15px;
+            color: #dc2626;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-box">
+        <h1>MiniBank</h1>
+        <p>Welcome! Login to your account</p>
+
+        <form id="loginForm">
+            <input type="text" id="username"
+                   placeholder="Username" required>
+
+            <input type="password" id="password"
+                   placeholder="Password" required>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <p id="message"></p>
+
+        <p>New customer? <a href="register.html">Create Account</a></p>
+    </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener(
+            "submit", async function(event) {
+
+                event.preventDefault();
+
+                const username = document.getElementById("username").value;
+                const password = document.getElementById("password").value;
+                const message = document.getElementById("message");
+
+                try {
+                    const response = await fetch("/api/accounts/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            username: username,
+                            password: password
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.error || "Login failed");
+                    }
+
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("username", data.username);
+                    localStorage.setItem("role", data.role);
+                    localStorage.setItem("accountId", data.accountId);
+
+                    if (data.role === "ADMIN") {
+                        window.location.href = "index.html";
+                    } else if (data.role === "USER") {
+                        window.location.href = "customer.html";
+                    } else {
+                        throw new Error("Unknown account role");
+                    }
+
+                } catch (error) {
+                    message.textContent = error.message;
+                }
+            }
+        );
+    </script>
+
+</body>
+</html>

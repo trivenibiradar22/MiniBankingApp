@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MiniBank Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #172554;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .box {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            width: 330px;
+            text-align: center;
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Create Bank Account</h2>
+
+        <form id="registerForm">
+            <input id="username" placeholder="Username" required>
+            <input id="password" type="password"
+                   placeholder="Password" required minlength="8">
+            <button type="submit">Create Account</button>
+        </form>
+
+        <p id="message"></p>
+        <a href="login.html">Already have an account? Login</a>
+    </div>
+
+    <script>
+        document.getElementById("registerForm")
+        .addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const message = document.getElementById("message");
+
+            try {
+                const response = await fetch("/api/accounts/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: document.getElementById("username").value,
+                        password: document.getElementById("password").value
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || "Registration failed");
+                }
+
+                message.style.color = "green";
+                message.textContent = "Account created! Please login.";
+                document.getElementById("registerForm").reset();
+
+            } catch (error) {
+                message.style.color = "red";
+                message.textContent = error.message;
+            }
+        });
+    </script>
+</body>
+</html>
